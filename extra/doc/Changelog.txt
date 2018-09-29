@@ -1,0 +1,72 @@
+3.9.1
+-----
+- [ECA-1354] - Update bc jars to run with EJBCA 3.9.1
+
+3.9.0
+-----
+- [ECA-1101] - ExtRA: Make RA CA service as an EJBCA service and make clusterable and support multiple RAs
+               Also possibility to use extra-custom working like ejbca-custom, a place to keep your configuration separated from the extra distribution.
+               
+3.8.0
+-----
+- Updated to work with EJBCA 3.8.0
+
+3.7.4
+-----
+- External RA SCEP service fails on cisco message with wrongly encoded request extension
+
+3.7.1
+-----
+- Updated to work with EJBCA 3.7.1
+
+3.7.0
+-----
+- Updated to work with EJBCA 3.7.0
+
+3.6.2
+-----
+- [ECA-841] - ExtRA PKCS12 request does not work with approvals
+
+3.6.0
+-----
+- [ECA-606] - ExtRA SCEP servlet should init directly at startup
+- [ECA-670] - ExtRA SCEP, GetCACertChain return wrong content type
+- [ECA-707] - ExtRA: make configuration of scep ra easier
+- [ECA-669] - ExtRA SCEP, possible to use pre-registered users and verify their passwords
+
+3.5.2
+-----
+- [ECA-618] - External RA SCEP module should include ip and dns altNames from request
+- [ECA-626] - ExtRA, possible to require SCEP password
+- [ECA-646] - ExtRA CA service throws exception when RAIssuer is signed by external CA
+
+3.5.0
+-----
+- ECA-494: Better default datasource for ScepRAServer in External RA
+- ECA-495: ScepRAServer in External RA will process the same message until it is approved
+- ECA-525: ExtRATestClient not working according to doc
+
+3.4.2
+-----
+- ECA-464: Scep RA Server supporting the Scep polling RA mode
+
+3.4.0
+-----
+- Updated BC jars to 1.35 to match EJBCA 3.4
+- ECA-388: Possibility to retrieve PKCS7 response in ExtRA API PKCS10 request
+
+3.3.0
+-----
+- Released
+
+3.3b11
+------
+- Addition of card renewal messages and service
+
+3.3b10
+------
+- Addition of more revocation options
+- Changed name of column user to messageId in database, to upgrade run (on mysql):
+  alter table message change user messageId varchar(255);
+
+  

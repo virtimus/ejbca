@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<project name="pkit PKI Tools" basedir="." default="all">
+    <target name="init">
+        <property name="build.compiler" value="jikes"/>
+        
+        <property name="build" value="build"/>
+        <property name="dist" value="dist"/>
+        <property name="apidoc" value="docs/api"/>
+	<property name="src" value="src"/>
+	<property name="etc" value="etc"/>
+		
+        <property name="libs" value=".\lib\bcprov-jdk14-115.jar;.\lib\log4j-1.2.jar;.\lib\ca.jar"/>
+        <property name="jarfile" value="${dist}/pkit.jar"/>
+        
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="./${src}" destdir="${build}" debug="true" deprecation="true">
+            <classpath>
+                <pathelement path="${libs}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="init,compile">
+        <jar jarfile="${jarfile}" compress="true" basedir="${build}" manifest="${etc}/manifest.mf" />
+    </target>
+
+    <target name="all" depends="init,jar" description="Build everything.">
+        <echo message="Application built."/>
+    </target>
+    
+       <target name="makeCACert" depends="all" description="Make a CA root cert." >
+		<java classname="se.anatom.ejbca.admin.ca"  fork="true">
+			            <classpath>
+				    	<path path="${libs}"/>
+				    </classpath>
+			<arg value="makeroot"/>
+			<arg value="C=ZA, O=My Organisation, OU=My Organisation Primary Certificate"/>
+			<arg value="1024"/>
+			<arg value="720"/>
+			<arg value="keystore.p12"/>
+			<arg value="password"/>
+		</java>
+    </target>    
+	
+    <target name="clean" depends="init" description="Clean all build products.">
+         <delete dir="${build}"/>
+         <delete dir="${dist}"/>
+	 <delete dir="${apidoc}"/>
+    </target>
+    
+      <target name="release" depends="clean" description="Make a tarball of everything except build dir">
+	 <ant target="jar"/>
+	 
+	 <tar basedir="../pkit" excludes="build/**,lib/bcprov*,dist/*tgz" tarfile="dist/pkit-noprov.tar"/>
+	 <gzip src="dist/pkit-noprov.tar" zipfile="dist/pkit-noprov.tgz"/>
+	  <delete file="dist/pkit-noprov.tar"/>
+	 
+	 <tar basedir="../pkit" excludes="build/**,dist/*tgz" tarfile="dist/pkit-full.tar"/>
+	 <gzip src="dist/pkit-full.tar" zipfile="dist/pkit-full.tgz"/>
+	 <delete file="dist/pkit-full.tar"/>
+    </target>
+    
+	<target name="javadoc" depends="init" >
+		<delete dir="${apidoc}"/>
+		<mkdir dir="${apidoc}"/>
+		<javadoc 	packagenames="pkit.cert.*"
+							sourcepath="${src}"
+							defaultexcludes="yes"
+							destdir="docs/api"
+							notree="true"
+							author="true"
+							version="true"
+							use="true"
+							windowtitle="PKI Tools"
+							>
+				<doctitle><![CDATA[<h1>PKI Tools</h1>]]></doctitle>
+			<classpath>
+				<pathelement location="${src}"/>
+			</classpath>
+		</javadoc>
+	</target>
+</project>

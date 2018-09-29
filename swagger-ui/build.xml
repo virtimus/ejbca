@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="swagger-ui" default="build">
+    <description>
+            Build files for the EJBCA swagger-ui module
+    </description>
+	
+	<dirname property="this.dir" file="${ant.file.swagger-ui}"/>
+	
+	<property name="build.dir" location="${this.dir}/build"/>
+	
+    <target name="clean" description="Clean up this module">
+		<delete dir="${build.dir}"/>
+    	<delete file="swagger-ui.war"/>
+    </target>
+
+    <target name="build" description="Build this module">
+    	<copy file="${this.dir}/resources/WEB-INF/web.xml" tofile="${build.dir}/WEB-INF/web.xml"/>
+    	<copy todir="${build.dir}/swagger-ui-dist">
+    		<fileset dir="${this.dir}/swagger-ui-dist"/>
+    	</copy>
+        <war destfile="swagger-ui.war" webxml="${build.dir}/WEB-INF/web.xml" basedir="${build.dir}"/>
+    </target>
+
+	<target name="setup">
+		<mkdir dir="${build.dir}/WEB-INF/classes"/>
+	</target>
+</project>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="buildtools" default="build" basedir=".">
+    <description>
+		Builds the ServiceManifestBuilder tool.
+    </description>
+    <property name="version" value="1.0.0"/>
+    <property name="java.target.version" value="${java.specification.version}"/>
+
+	<dirname property="buildtools.dir" file="${ant.file.buildtools}"/>
+	<property name="buildtools.build.dir" location="${buildtools.dir}/build"/>
+	<property name="buildtools.dist.dir" location="${buildtools.dir}/dist"/>
+	<property name="buildtools.build-test.dir" location="${buildtools.dir}/build-test"/>
+	<property name="buildtools.src.dir" location="${buildtools.dir}/src"/>
+	<property name="buildtools.src-test.dir" location="${buildtools.dir}/src-test"/>
+	<property name="reports.base.dir" location="${buildtools.dir}/reports/"/>
+	<property name="reports.dir" location="${reports.base.dir}/test"/>		
+	
+    <target name="clean" description="Clean up this module">
+		<delete dir="${buildtools.build.dir}" />
+    	<delete dir="${buildtools.dist.dir}" />
+    	<delete dir="${buildtools.build-test.dir}" />
+    	<delete dir="${reports.dir}" />
+    </target>
+	
+	<path id="lib.junit.classpath">
+		<fileset dir="${buildtools.dir}/lib/ext">
+			<include name="junit-*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="lib.log4j.classpath">
+		<fileset dir="${buildtools.dir}/lib" includes="log4j*.jar"/>
+	</path>
+
+	
+    <target name="compile-servicemanifestbuilder">
+    	<mkdir dir="${buildtools.build.dir}" />
+        <javac destdir="${buildtools.build.dir}" debug="on" includeantruntime="no" encoding="UTF-8" target="${java.target.version}">
+        	<src path="${buildtools.src.dir}"/>
+        </javac>
+    </target>
+      
+    <target name="build" depends="clean, compile-servicemanifestbuilder, test" description="Builds and tests the ServiceManifestBuilder">
+    	<mkdir dir="${buildtools.dist.dir}" />
+    	<jar jarfile="${buildtools.dist.dir}/servicemanifestbuilder-${version}.jar" >
+        	<manifest>
+        	    <attribute name="Implementation-Title" value="ServiceManifestBuilder"/>
+        	    <attribute name="Implementation-Version" value="${version}"/>
+        	    <attribute name="License" value="LGPL"/>
+        	</manifest>
+            <fileset dir="${buildtools.build.dir}" includes="com/primekey/**" />            	
+        </jar>
+    </target>
+    
+    <!-- Tests -->
+    <target name="compile-tests" depends="compile-servicemanifestbuilder">
+    	<mkdir dir="${buildtools.build-test.dir}" />
+        <javac srcdir="${buildtools.src-test.dir}" destdir="${buildtools.build-test.dir}" debug="on" includeantruntime="no"
+        	encoding="UTF-8" target="${java.target.version}">
+        	<classpath>
+        		<path refid="lib.junit.classpath"/>
+        		<path refid="lib.log4j.classpath"/>
+                <path location="${buildtools.build.dir}" />
+        		<path location="${buildtools.build-test.dir}" />
+        	</classpath>
+    	</javac>
+    </target>
+
+	<target name="test" depends="compile-tests" description="Run tests for this module">
+    	<mkdir dir="${reports.dir}" />
+		<mkdir dir="${reports.dir}/html"/>
+		<antcall target="showtime"/>
+		<junit printsummary="yes" haltonfailure="no" dir="${buildtools.build-test.dir}">
+			<classpath>
+                <path refid="lib.junit.classpath"/>
+        		<path refid="lib.log4j.classpath"/>
+                <path location="${buildtools.build.dir}" />
+				<path location="${buildtools.build-test.dir}" />
+			</classpath>
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${reports.dir}">
+				<fileset dir="${buildtools.build-test.dir}" includes="**/*Test.class">
+				</fileset>
+			</batchtest>
+		</junit>
+    	<antcall target="showtime"/>
+    </target>
+	
+	<target name="showtime">
+		<tstamp>
+			<format property="currenttime" pattern="yyyy-MM-dd HH:mm:ss Z" />
+		</tstamp>
+		<echo message="Current time is ${currenttime}." />
+	</target>
+
+</project>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/bcpkix-jdk15on-160.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-160.jar"/>
+	<classpathentry kind="lib" path="lib/ejbca-common.jar"/>
+	<classpathentry kind="lib" path="lib/cesecore-common.jar" sourcepath="/ejbca_alpha"/>
+	<classpathentry kind="lib" path="lib/cesecore-ejb-interface.jar" sourcepath="/ejbca_alpha"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="lib/ejbca-interface.jar"/>
+	<classpathentry kind="lib" path="lib/ext/servicemanifestbuilder-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsch-0.1.45.jar"/>
+	<classpathentry kind="lib" path="lib/javaee-api-6.0-6.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

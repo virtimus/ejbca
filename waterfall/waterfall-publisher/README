@@ -1,0 +1,116 @@
+Waterfall Publisher for EJBCA 6.15.0 and later
+=============================================
+
+The purpose of the Waterfall publisher is to sign published data and send it as a unique file to a designated directory on a distant VA-server.
+
+CRL and Certificate data are sent to separate directories in order for the Waterfall reader application to function properly.
+
+Both published objects are signed by a designated CA's certificate signature key.
+
+Note: If you (for some reason) do not want your regular CA signing key to sign "Waterfall" data, any easy workaround is defining a specific CA for 
+that purpose.
+
+
+
+The Waterfall publisher can perform its task using two different mechanisms:
+
+1. Through a built-in SCP mechanism.  Note: this solution depends on private-key authentication using a key without password.
+
+2. Through an external script.  This is the most flexible solution but also has limited throughput on some operating systems.
+
+It is recommended running the Waterfall publisher in "queued mode" to maintain a high burst mode certification rate.  If the certification
+requests rather are continues, there is no advantage using queued mode.
+
+
+Build and Upgrading
+=====
+
+Prior to Upgrading:
+
+1. Remove all references to the Waterfall Publisher from CAs and Certificate Profiles. 100% uptime during the upgrade will not be possible. 
+2. Open the old Waterfall Publisher and copy down the configuration. This will be needed later.
+3. Remove the old Waterfall Publisher
+
+Building and Upgrading
+
+1. Go to the base directory of the new Waterfall Publisher
+2. Build using the command "and build", which should produce a the Waterfall JAR file. Place this file in a known location. 
+3. Go to the EJBCA 6.15 directory and rename conf/plugin/plugin.properties.sample to waterfall.properties (or the equivalent in an ejbca-custom directory)
+4. Modify waterfall.properties so that the property plugin.ejbca.lib.dir= points to the directory containing the Waterfall JAR
+5. Build and Upgrade EJBCA as stated in the documentation
+
+Reconfiguring the Waterfall Publisher
+
+1. Go to the Publisher Page
+2. Create a new Publisher and select Waterfall from the list of upgrades. Paste in the configuration from the old Publisher. If not found, then 
+	waterfall.properties was not configured correctly. 
+3. Reselect the Waterfall Publisher in all required CAs
+
+
+Properties of Custom Publisher:
+
+Common for both publishing schemes
+----------------------------------
+
+# The symbolic name of the signing CA
+signingCA MyCA
+
+# Option for anonymizing all EE certificates except for OCSP
+anonymizeCertificates true
+
+
+Specific properties for the built-in SCP solution
+-------------------------------------------------
+
+# The CRL destination directory on the VA server
+crl.scp.destination ejbca@validation.example.com:/home/ejbca/egov.publisher/crls
+
+# The certificate destination directory on the VA server
+cert.scp.destination ejbca@validation.example.com:/home/ejbca/egov.publisher/certificates
+
+scp.privatekey /home/ejbca/.ssh/id_rsa
+
+scp.knownhosts /home/ejbca/.ssh/known_hosts
+
+
+
+Specific properties for the external script solution
+----------------------------------------------------
+
+# Where temporary files are put
+workingDirectory /home/ejbca/egov.publisher/sender
+
+# Error handling option
+failOnStandardError true
+
+# Error handling option
+failOnErrorCode true
+
+# The scripts that will be called for the two different objects
+crl.application /home/ejbca/egov.publisher/scripts/shoot-crl.sh
+cert.application /home/ejbca/egov.publisher/scripts/shoot-certificate.sh
+
+
+
+Sample external script
+======================
+
+#!/bin/sh
+### ====================================================================== ###
+##                                                                          ##
+##  Certificate updater send script                                         ##
+##                                                                          ##
+### ====================================================================== ###
+
+scp -o GSSAPIAuthentication=no $1 demo@validation.example.com:/home/ejbca/egov.publisher/certificates
+rm $1
+
+If you rather prefer SFTP for SCP (they both build on SSH) the following lines should work.
+
+echo -e "cd /home/ejbca/egov.publisher/certificates\nput $1\nexit\n" >$1.sftp
+sftp -o GSSAPIAuthentication=no -b $1.sftp ejbca@validation.example.com >/dev/null
+rm $1
+rm $1.sftp
+
+Note: Scripts only have a single parameter (file-name).
+The sample copies the file to another place and removes it after.

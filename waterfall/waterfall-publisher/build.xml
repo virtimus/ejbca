@@ -1,0 +1,56 @@
+<project name="eGov.il" default="build" basedir=".">
+
+	<!-- Version 1.1.0 is compiled to be compatible with EJBCA 6.15.0 -->
+	<property name="version" value="1.1.0" />
+
+
+	<!-- set global properties for this build -->
+	<dirname property="this.dir" file="${ant.file}" />
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="${this.dir}/lib" />
+	<property name="build.dir" value="${this.dir}/build" />
+	<property name="dist.dir" value="${this.dir}/dist" />
+	<property name="target.jar" value="egov.il-wf-publisher-${version}.jar" />
+	<property name="debug" value="on" />
+
+	<path id="compile.classpath">
+		<fileset dir="${lib.dir}" />
+	</path>
+
+	<target name="clean" description="Clean up this plugin">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="build" description="Use this command to build the waterfall jar.">
+		<echo message="Building EJBCA eGov.IL plugin" />
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" debug="${debug}" destdir="${build.dir}" classpathref="compile.classpath" includeantruntime="false">
+			<compilerarg value="-Xlint:-path" />
+		</javac>
+		<buildservicemanifest interface="org.ejbca.core.model.ca.publisher.ICustomPublisher" file="${build.dir}" classpath="compile.classpath" />
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/${target.jar}">
+			<fileset dir="${build.dir}" />
+		</jar>
+
+	</target>
+
+	<macrodef name="buildservicemanifest">
+		<attribute name="classpath" />
+		<attribute name="file" />
+		<attribute name="interface" />
+		<element name="buildservicemanifest" implicit="yes" />
+		<sequential>
+			<!-- Enable to see full classpath provided to this call
+				<pathconvert property="buildservicemanifestbuilder.debug.class.path" refid="@{classpath}"/>
+				<echo message="buildservicemanifestbuilder classpath: @{classpath} = ${buildservicemanifestbuilder.debug.class.path}"/>
+				-->
+			<java classname="com.primekey.anttools.ServiceManifestBuilder" fork="true" failonerror="true" classpathref="compile.classpath">
+				<arg value="@{file}" />
+				<arg value="@{interface}" />
+			</java>
+		</sequential>
+	</macrodef>
+
+</project>
