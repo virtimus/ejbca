@@ -1,5 +1,5 @@
 <%@ include file="header.jsp" %>
-  <h1 class="title">Welcome to the public EJBCA pages</h1>
+  <h1 class="title">Witamy na publicznych stronach EJBCA</h1>
   <h2>Enroll</h2>
   <ul>
 	  <li>Create Browser Certificate - Install a certificate in your web browser. This certificate may be exportable depending on browser and browser settings.</li>
